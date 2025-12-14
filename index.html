@@ -74,20 +74,21 @@
 </head>
 <body>
   <!-- Access Gate -->
-  <div id="gate" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f7f7f7;">
+   <div id="gate" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f7f7f7;">
     <div style="background:#fff;padding:30px;border-radius:8px;max-width:400px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,0.1);">
       <h2 style="margin-top:0">Private Listing Access</h2>
       <p style="font-size:0.95rem;color:#555">This is a private For-Sale-By-Owner listing. Please enter your details to continue.</p>
       <form id="accessForm">
         <label>Email</label><br/>
-        <input type="email" id="email" required style="width:100%;padding:10px;margin:8px 0 15px 0" />
+        <input type="email" id="email" name="entry.EMAIL_ID" required style="width:100%;padding:10px;margin:8px 0 15px 0" />
         <label>Phone Number</label><br/>
-        <input type="tel" id="phone" required style="width:100%;padding:10px;margin:8px 0 20px 0" />
+        <input type="tel" id="phone" name="entry.PHONE_ID" required style="width:100%;padding:10px;margin:8px 0 20px 0" />
         <button type="submit" style="width:100%;padding:12px;background:#2c7be5;color:#fff;border:none;border-radius:6px;font-size:1rem">View Listing</button>
       </form>
-    <p style="font-size:0.8rem;color:#777;margin-top:15px">Your information is only used to track private interest.</p>
+      <p style="font-size:0.8rem;color:#777;margin-top:15px">Your information is only used to track private interest.</p>
     </div>
   </div>
+
 
 
 <!-- Listing Content -->
@@ -150,38 +151,53 @@
       Private listing – not publicly marketed
     </footer>
   </div>
- <script>
+ <div id="gate" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f7f7f7;">
+  <div style="background:#fff;padding:30px;border-radius:8px;max-width:400px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+    <h2 style="margin-top:0">Private Listing Access</h2>
+    <p style="font-size:0.95rem;color:#555">This is a private For-Sale-By-Owner listing. Please enter your details to continue.</p>
+    <form id="accessForm">
+      <label>Email</label><br/>
+      <input type="email" id="email" name="entry.EMAIL_ID" required style="width:100%;padding:10px;margin:8px 0 15px 0" />
+      <label>Phone Number</label><br/>
+      <input type="tel" id="phone" name="entry.PHONE_ID" required style="width:100%;padding:10px;margin:8px 0 20px 0" />
+      <button type="submit" style="width:100%;padding:12px;background:#2c7be5;color:#fff;border:none;border-radius:6px;font-size:1rem">View Listing</button>
+    </form>
+    <p style="font-size:0.8rem;color:#777;margin-top:15px">Your information is only used to track private interest.</p>
+  </div>
+</div>
+
+<script>
     const form = document.getElementById('accessForm');
 
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
 
-    form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
+      // Submit to Google Form
+      try {
+        await fetch('https://docs.google.com/forms/d/e/1FAIpQLScnwv5zjgwf5_v68ORZj5kS7Tp5BrEPNde8jCjo6mFN9-8j_w/formResponse', {
+          method: 'POST',
+          mode: 'no-cors',
+          body: formData
+        });
+      } catch (error) {
+        console.log('Form submitted (CORS expected)');
+      }
 
-
-    if(email && phone) {
-    // Send data to Google Apps Script
-    // Email CSV row to owner using mailto (no backend)
-    const csvRow = `${new Date().toISOString()},${email},${phone}`;
-    const subject = encodeURIComponent('New FSBO Listing Visitor');
-    const body = encodeURIComponent(`New visitor details (CSV format):\n\nTimestamp,Email,Phone\n${csvRow}`);
-    window.location.href = `mailto:parulguptasmail@email.com?subject=${subject}&body=${body}`;
-
-
-    // Store locally to avoid repeat prompt
-    localStorage.setItem('fsbo_access', JSON.stringify({ email, phone, date: new Date() }));
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('listing').style.display = 'block';
-    }
+      // Store locally and show listing
+      localStorage.setItem('fsbo_access', JSON.stringify({ email, phone, date: new Date() }));
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('listing').style.display = 'block';
     });
-
 
     // Auto-unlock if already accessed
     if(localStorage.getItem('fsbo_access')) {
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('listing').style.display = 'block';
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('listing').style.display = 'block';
     }
   </script>
-</body>
+</body> 
 </html>

@@ -150,8 +150,10 @@
       Private listing – not publicly marketed
     </footer>
   </div>
-  <script>
+ <script>
     const form = document.getElementById('accessForm');
+
+
     form.addEventListener('submit', function(e) {
     e.preventDefault();
     const email = document.getElementById('email').value;
@@ -159,7 +161,15 @@
 
 
     if(email && phone) {
-    // Store locally (simple privacy-friendly gate)
+    // Send data to Google Apps Script
+    // Email CSV row to owner using mailto (no backend)
+    const csvRow = `${new Date().toISOString()},${email},${phone}`;
+    const subject = encodeURIComponent('New FSBO Listing Visitor');
+    const body = encodeURIComponent(`New visitor details (CSV format):\n\nTimestamp,Email,Phone\n${csvRow}`);
+    window.location.href = `mailto:parulguptasmail@email.com?subject=${subject}&body=${body}`;
+
+
+    // Store locally to avoid repeat prompt
     localStorage.setItem('fsbo_access', JSON.stringify({ email, phone, date: new Date() }));
     document.getElementById('gate').style.display = 'none';
     document.getElementById('listing').style.display = 'block';
@@ -172,6 +182,6 @@
     document.getElementById('gate').style.display = 'none';
     document.getElementById('listing').style.display = 'block';
     }
-</script>
+  </script>
 </body>
 </html>

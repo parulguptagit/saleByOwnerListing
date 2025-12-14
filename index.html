@@ -150,5 +150,28 @@
       Private listing – not publicly marketed
     </footer>
   </div>
+  <script>
+    const form = document.getElementById('accessForm');
+    form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+
+
+    if(email && phone) {
+    // Store locally (simple privacy-friendly gate)
+    localStorage.setItem('fsbo_access', JSON.stringify({ email, phone, date: new Date() }));
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('listing').style.display = 'block';
+    }
+    });
+
+
+    // Auto-unlock if already accessed
+    if(localStorage.getItem('fsbo_access')) {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('listing').style.display = 'block';
+    }
+</script>
 </body>
 </html>

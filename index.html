@@ -74,15 +74,16 @@
 </head>
 <body>
   <!-- Access Gate -->
+  <!--https://docs.google.com/forms/d/e/1FAIpQLScnwv5zjgwf5_v68ORZj5kS7Tp5BrEPNde8jCjo6mFN9-8j_w/viewform?usp=pp_url&entry.1682604229=parul&entry.141099191=1234-->
    <div id="gate" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f7f7f7;">
     <div style="background:#fff;padding:30px;border-radius:8px;max-width:400px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,0.1);">
       <h2 style="margin-top:0">Private Listing Access</h2>
       <p style="font-size:0.95rem;color:#555">This is a private For-Sale-By-Owner listing. Please enter your details to continue.</p>
       <form id="accessForm">
         <label>Email</label><br/>
-        <input type="email" id="email" name="entry.EMAIL_ID" required style="width:100%;padding:10px;margin:8px 0 15px 0" />
+        <input type="email" id="email" name="entry.1682604229" required style="width:100%;padding:10px;margin:8px 0 15px 0" />
         <label>Phone Number</label><br/>
-        <input type="tel" id="phone" name="entry.PHONE_ID" required style="width:100%;padding:10px;margin:8px 0 20px 0" />
+        <input type="tel" id="phone" name="entry.141099191" required style="width:100%;padding:10px;margin:8px 0 20px 0" />
         <button type="submit" style="width:100%;padding:12px;background:#2c7be5;color:#fff;border:none;border-radius:6px;font-size:1rem">View Listing</button>
       </form>
       <p style="font-size:0.8rem;color:#777;margin-top:15px">Your information is only used to track private interest.</p>
@@ -167,25 +168,51 @@
 </div>
 
 <script>
+  const FORM_ID = '1QOZSQ9kc7SX-sbVKn8XNpHKlUcqmpTSzz4EJCbICmBs'; // e.g., '1FAIpQLSe...'
+  const EMAIL_ENTRY = 'entry.1682604229'; // Replace with your actual email entry ID
+  const PHONE_ENTRY = 'entry.141099191'; // Replace with your actual phone entry ID
+
     const form = document.getElementById('accessForm');
 
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      const formData = new FormData(form);
       const email = document.getElementById('email').value;
       const phone = document.getElementById('phone').value;
 
-      // Submit to Google Form
-      try {
-        await fetch('https://docs.google.com/forms/d/e/1FAIpQLScnwv5zjgwf5_v68ORZj5kS7Tp5BrEPNde8jCjo6mFN9-8j_w/formResponse', {
-          method: 'POST',
-          mode: 'no-cors',
-          body: formData
-        });
-      } catch (error) {
-        console.log('Form submitted (CORS expected)');
-      }
+      const iframe = document.createElement('iframe');
+      iframe.name = 'hidden_iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      const googleForm = document.createElement('form');
+      googleForm.action = `https://docs.google.com/forms/d/${FORM_ID}/formResponse`;
+      googleForm.method = 'POST';
+      googleForm.target = 'hidden_iframe';
+
+      // Add email field
+      const emailInput = document.createElement('input');
+      emailInput.type = 'hidden';
+      emailInput.name = EMAIL_ENTRY;
+      emailInput.value = email;
+      googleForm.appendChild(emailInput);
+
+      // Add phone field
+      const phoneInput = document.createElement('input');
+      phoneInput.type = 'hidden';
+      phoneInput.name = PHONE_ENTRY;
+      phoneInput.value = phone;
+      googleForm.appendChild(phoneInput);
+
+      // Submit form
+      document.body.appendChild(googleForm);
+      googleForm.submit();
+
+      // Clean up and show listing after brief delay
+      setTimeout(() => {
+        document.body.removeChild(googleForm);
+        document.body.removeChild(iframe);
+      }, 1000);
 
       // Store locally and show listing
       localStorage.setItem('fsbo_access', JSON.stringify({ email, phone, date: new Date() }));

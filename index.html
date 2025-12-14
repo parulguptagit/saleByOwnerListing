@@ -73,6 +73,24 @@
   </style>
 </head>
 <body>
+  <!-- Access Gate -->
+  <div id="gate" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f7f7f7;">
+    <div style="background:#fff;padding:30px;border-radius:8px;max-width:400px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+      <h2 style="margin-top:0">Private Listing Access</h2>
+      <p style="font-size:0.95rem;color:#555">This is a private For-Sale-By-Owner listing. Please enter your details to continue.</p>
+      <form id="accessForm">
+        <label>Email</label><br/>
+        <input type="email" id="email" required style="width:100%;padding:10px;margin:8px 0 15px 0" />
+        <label>Phone Number</label><br/>
+        <input type="tel" id="phone" required style="width:100%;padding:10px;margin:8px 0 20px 0" />
+        <button type="submit" style="width:100%;padding:12px;background:#2c7be5;color:#fff;border:none;border-radius:6px;font-size:1rem">View Listing</button>
+      </form>
+    <p style="font-size:0.8rem;color:#777;margin-top:15px">Your information is only used to track private interest.</p>
+    </div>
+  </div>
+
+
+<!-- Listing Content -->
   <div class="container">
     <h1>Beautiful Town Home in Village Pointe – Private Sale</h1>
     <div class="price">$630,000</div>

@@ -159,7 +159,7 @@
 
     const form = document.getElementById('accessForm');
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', async function(e) {
       e.preventDefault();
       
       const email = document.getElementById('email').value;
@@ -167,62 +167,52 @@
 
       console.log('Submitting:', email, phone);
 
-      // Create hidden iframe for form submission
-      const iframe = document.createElement('iframe');
-      iframe.name = 'hidden_iframe';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
+      // Build the Google Form submission URL with parameters
+    const baseURL = `https://docs.google.com/forms/d/${FORM_ID}/formResponse`;
+    const params = new URLSearchParams();
+    params.append(EMAIL_ENTRY, email);
+    params.append(PHONE_ENTRY, phone);
 
-      // Create form that submits to Google
-      const googleForm = document.createElement('form');
-      googleForm.action = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
-      googleForm.method = 'POST';
-      googleForm.target = 'hidden_iframe';
+    const fullURL = `${baseURL}?${params.toString()}`;
+    
+    console.log('Submitting to:', fullURL);
 
-      // Add email field
-      const emailInput = document.createElement('input');
-      emailInput.type = 'hidden';
-      emailInput.name = EMAIL_ENTRY;
-      emailInput.value = email;
-      googleForm.appendChild(emailInput);
+    // Method 1: Try with fetch (no-cors)
+    try {
+      await fetch(fullURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+      console.log('Submission sent via fetch');
+    } catch (error) {
+      console.error('Fetch error:', error);
+    }
 
-      // Add phone field
-      const phoneInput = document.createElement('input');
-      phoneInput.type = 'hidden';
-      phoneInput.name = PHONE_ENTRY;
-      phoneInput.value = phone;
-      googleForm.appendChild(phoneInput);
+    // Method 2: Backup using Image tag (always works)
+    const img = new Image();
+    img.src = fullURL;
+    console.log('Submission sent via image');
 
-      // Submit to Google Forms
-      document.body.appendChild(googleForm);
-      googleForm.submit();
-
-      console.log('Form submitted to Google');
-
-      // Clean up after 1 second
-      setTimeout(() => {
-        if (document.body.contains(googleForm)) document.body.removeChild(googleForm);
-        if (document.body.contains(iframe)) document.body.removeChild(iframe);
-      }, 1000);
-
-      // Store access and show listing
+    // Store access and show listing after a brief delay
+    setTimeout(() => {
       localStorage.setItem('fsbo_access', JSON.stringify({ email, phone, date: new Date() }));
-      
-      console.log('Showing listing...');
       document.getElementById('gate').style.display = 'none';
       document.getElementById('listing').style.display = 'block';
-    });
+      console.log('Listing displayed');
+    }, 500);
+  });
 
-    // Check if user already accessed (on page load)
-    window.addEventListener('DOMContentLoaded', function() {
-      if (localStorage.getItem('fsbo_access')) {
-        console.log('User already accessed - showing listing');
-        document.getElementById('gate').style.display = 'none';
-        document.getElementById('listing').style.display = 'block';
-      } else {
-        console.log('First visit - showing gate');
-      }
-    });
+  // Check if user already accessed
+  window.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('fsbo_access')) {
+      console.log('Returning user - showing listing');
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('listing').style.display = 'block';
+    }
+  });
   </script>
 </body> 
 </html>
